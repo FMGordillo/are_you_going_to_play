@@ -24,7 +24,7 @@ jobs:
         toolchain: ${{ matrix.rust-version }}
     
     - name: Build
-      run: cargo build --release --verbose --package are_you_going_to_play-${matrix.os}
+      run: cargo build --release --verbose --package are_you_going_to_play-${{ matrix.os }}
 
   create_release:
     runs-on: ubuntu-latest
