@@ -25,22 +25,13 @@ jobs:
     
     - name: Build
       run: cargo build --release --verbose --package are_you_going_to_play
-      
-    - name: Create release
-      uses: actions/create-release@v1
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.event.release.tag_name }}
-        release_name: ${{ github.event.release.tag_name }}
     
     - name: Upload artifact
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        ref: ${{ github.ref }}
         asset_path: ./target/release/are_you_going_to_play
         asset_name: are_you_going_to_play
         asset_content_type: application/octet-stream
