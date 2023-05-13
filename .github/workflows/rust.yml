@@ -9,24 +9,26 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  haber:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         rust-version: [stable]
-
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup Rust for ${{ matrix.rust-version }}
       uses: actions-rs/toolchain@v1
       with:
         toolchain: ${{ matrix.rust-version }}
     
     - name: Build
-      run: cargo build --release --verbose --package are_you_going_to_play
-    
+      run: cargo build --release --verbose --package are_you_going_to_play-${matrix.os}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
