@@ -9,44 +9,22 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_for_os:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        rust-version: [stable]
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Setup Rust for ${{ matrix.rust-version }}
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ matrix.rust-version }}
-    
-    - name: Build
-      run: cargo build --release --verbose --package are_you_going_to_play-${{ matrix.os }}
-
-  create_release:
+  build:
     runs-on: ubuntu-latest
-    needs: build_for_os
     steps:
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Build binaries
+      run: |
+          cargo build --release --target x86_64-unknown-linux-gnu
+          cargo build --release --target x86_64-pc-windows-gnu
+          cargo build --release --target x86_64-apple-darwin
+          
+    - name: Archive binaries
+      uses: actions/upload-artifact@v2
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-    
-    - name: Upload artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        asset_path: ./target/release/are_you_going_to_play
-        asset_name: are_you_going_to_play
-        asset_content_type: application/octet-stream
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+          name: binaries
+          path: |
+            target/x86_64-unknown-linux-gnu/release/are_you_going_to_play
+            target/x86_64-pc-windows-gnu/release/are_you_going_to_play.exe
+            target/x86_64-apple-darwin/release/are_you_going_to_play
